@@ -1,7 +1,9 @@
-import { useMemo } from 'react';
-import { useTamboThread, useTamboThreadInput } from '@tambo-ai/react';
+import { useMemo, useRef, useState, useEffect } from 'react';
+import { useTamboThread } from '@tambo-ai/react';
 import { motion } from 'framer-motion';
+import ReactMarkdown from 'react-markdown';
 import { SuggestedQueries } from './SuggestedQueries.jsx';
+import { getDemoResponse } from '../../data/demoResponses.jsx';
 
 function getTextParts(content) {
   if (typeof content === 'string') {
@@ -15,52 +17,82 @@ function getTextParts(content) {
   return [];
 }
 
+function isJsonLike(text) {
+  const trimmed = text.trim();
+  if (!trimmed) return false;
+  return (
+    (trimmed.startsWith('{') && trimmed.endsWith('}')) ||
+    (trimmed.startsWith('[') && trimmed.endsWith(']'))
+  );
+}
+
 export function ChatInterface() {
-  const { thread } = useTamboThread();
-  const { value, setValue, submit, isPending } = useTamboThreadInput();
+  const { thread, sendThreadMessage, isIdle } = useTamboThread();
+  const [inputValue, setInputValue] = useState('');
+  const [localMessages, setLocalMessages] = useState([]);
+  const isPending = !isIdle;
+  const scrollRef = useRef(null);
 
-  const messages = useMemo(() => thread?.messages ?? [], [thread]);
+  const messages = useMemo(() => {
+    const remoteMessages = thread?.messages ?? [];
+    return [...localMessages, ...remoteMessages];
+  }, [localMessages, thread]);
 
-  const handleSubmit = (event) => {
+  useEffect(() => {
+    if (!scrollRef.current) return;
+    scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  }, [messages, isPending]);
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!value.trim() || isPending) return;
-    submit();
+    if (!inputValue?.trim() || isPending) return;
+    const trimmed = inputValue.trim();
+    const demoResponse = getDemoResponse(trimmed);
+
+    if (demoResponse) {
+      setLocalMessages((prev) => [
+        ...prev,
+        { id: `local-user-${Date.now()}`, role: 'user', content: trimmed },
+        {
+          id: `local-assistant-${Date.now() + 1}`,
+          role: 'assistant',
+          content: demoResponse.text,
+          renderedComponents: demoResponse.components
+        }
+      ]);
+      setInputValue('');
+      return;
+    }
+
+    await sendThreadMessage(trimmed, { streamResponse: true });
+    setInputValue('');
   };
 
   const handleSuggestion = (text) => {
-    setValue(text);
+    setInputValue(text);
   };
 
   return (
-    <div className="flex h-full flex-col gap-6">
-      <section className="rounded-2xl border border-white/10 bg-bg-secondary/60 p-4">
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3 md:flex-row">
-          <input
-            type="text"
-            value={value}
-            onChange={(event) => setValue(event.target.value)}
-            placeholder="Ask me anything about your workspace..."
-            className="flex-1 rounded-xl border border-white/10 bg-bg-tertiary/80 px-4 py-3 text-sm text-text-primary placeholder:text-text-muted focus:border-accent-primary/60 focus:outline-none"
-            disabled={isPending}
-          />
-          <button
-            type="submit"
-            disabled={isPending}
-            className="rounded-xl bg-accent-primary px-6 py-3 text-sm font-semibold text-bg-primary transition hover:bg-accent-hover disabled:opacity-60"
-          >
-            {isPending ? 'Thinking…' : 'Send'}
-          </button>
-        </form>
-      </section>
-
-      {messages.length === 0 && <SuggestedQueries onSelect={handleSuggestion} />}
-
-      <section className="space-y-6">
+    <div className="flex h-[calc(100vh-180px)] flex-col gap-6">
+      <section
+        ref={scrollRef}
+        className="flex-1 space-y-6 overflow-y-auto pr-2 scrollbar-hidden"
+      >
         {messages.map((message, index) => {
           const isUser = message.role === 'user';
-          const textParts = getTextParts(message.content);
+          const textParts = getTextParts(message.content)
+            .map((part) => part.trim())
+            .filter((part) => part.length > 0 && !isJsonLike(part));
           const renderedComponent = message.renderedComponent || null;
           const renderedComponents = message.renderedComponents || [];
+          const hasContent =
+            textParts.length > 0 ||
+            Boolean(renderedComponent) ||
+            renderedComponents.length > 0;
+
+          if (!isUser && !hasContent) {
+            return null;
+          }
 
           return (
             <motion.div
@@ -79,9 +111,12 @@ export function ChatInterface() {
               ) : (
                 <div className="rounded-2xl border border-white/10 bg-bg-secondary/60 p-4">
                   {textParts.map((part, idx) => (
-                    <p key={idx} className="text-sm text-text-secondary">
+                    <ReactMarkdown
+                      key={idx}
+                      className="prose prose-invert max-w-none text-sm text-text-secondary"
+                    >
                       {part}
-                    </p>
+                    </ReactMarkdown>
                   ))}
 
                   {renderedComponent && (
@@ -109,6 +144,27 @@ export function ChatInterface() {
             ContextFlow is thinking…
           </div>
         )}
+        {messages.length === 0 && <SuggestedQueries onSelect={handleSuggestion} />}
+      </section>
+
+      <section className="rounded-2xl border border-white/10 bg-bg-secondary/60 p-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3 md:flex-row">
+          <input
+            type="text"
+            value={inputValue ?? ''}
+            onChange={(event) => setInputValue(event.target.value)}
+            placeholder="Ask me anything about your workspace..."
+            className="flex-1 rounded-xl border border-white/10 bg-white/95 px-4 py-3 text-sm text-bg-primary placeholder:text-slate-500 focus:border-accent-primary/60 focus:outline-none"
+            disabled={isPending}
+          />
+          <button
+            type="submit"
+            disabled={isPending}
+            className="rounded-xl bg-accent-primary px-6 py-3 text-sm font-semibold text-bg-primary transition hover:bg-accent-hover disabled:opacity-60"
+          >
+            {isPending ? 'Thinking…' : 'Send'}
+          </button>
+        </form>
       </section>
     </div>
   );

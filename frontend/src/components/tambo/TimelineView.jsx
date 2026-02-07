@@ -9,7 +9,7 @@ const typeLabel = {
   other: 'Update'
 };
 
-export function TimelineView({ title, events }) {
+export function TimelineView({ title, events = [] }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}

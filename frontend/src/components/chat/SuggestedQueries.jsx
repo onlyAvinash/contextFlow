@@ -1,10 +1,4 @@
-const suggestions = [
-  'Show me all P0 bugs assigned to me',
-  'What did engineering ship last week?',
-  'Who is available for a meeting tomorrow at 3pm?',
-  'Find docs about authentication',
-  'Summarize recent backend commits'
-];
+import { suggestedQueries } from '../../data/demoResponses.jsx';
 
 const quickActions = [
   'View My Tasks',
@@ -18,7 +12,7 @@ export function SuggestedQueries({ onSelect }) {
       <div className="rounded-2xl border border-white/10 bg-bg-secondary/70 p-4">
         <h3 className="text-sm font-semibold text-text-secondary">Try asking</h3>
         <ul className="mt-3 space-y-2 text-sm text-text-muted">
-          {suggestions.map((item) => (
+          {suggestedQueries.map((item) => (
             <li
               key={item}
               className="cursor-pointer rounded-lg border border-white/5 bg-bg-tertiary/60 px-3 py-2 transition hover:border-accent-primary/40 hover:text-text-primary"

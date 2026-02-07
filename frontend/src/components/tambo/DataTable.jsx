@@ -22,7 +22,7 @@ function formatCell(value, type) {
   return value;
 }
 
-export function DataTable({ title, columns, rows, actions }) {
+export function DataTable({ title, columns = [], rows = [], actions }) {
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.98 }}
