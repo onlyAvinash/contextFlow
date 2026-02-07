@@ -12,13 +12,15 @@
     "@fontsource/jetbrains-mono": "^5.0.19",
     "@fontsource/manrope": "^5.0.19",
     "@fontsource/space-grotesk": "^5.0.19",
-    "@tambo-ai/react": "^0.10.0",
+    "@modelcontextprotocol/sdk": "^1.24.0",
+    "@tambo-ai/react": "^0.45.0",
     "framer-motion": "^11.0.0",
     "lucide-react": "^0.468.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "recharts": "^2.12.7",
-    "zod": "^3.23.8"
+    "zod": "^4.0.0",
+    "zod-to-json-schema": "^3.25.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.2.1",
