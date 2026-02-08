@@ -31,10 +31,6 @@ Create `frontend/.env` with your Tambo key:
 VITE_TAMBO_API_KEY=YOUR_TAMBO_API_KEY
 VITE_API_BASE_URL=http://localhost:3001
 
-# Optional MCP URLs (client-side MCP)
-VITE_GITHUB_MCP_URL=
-VITE_NOTION_MCP_URL=
-VITE_CALENDAR_MCP_URL=
 ```
 
 ### 3) Start the backend
