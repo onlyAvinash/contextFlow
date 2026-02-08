@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { mockBugs, mockCommits, mockDocs, mockCalendar } = require('./data/mockData');
+const { mockBugs, mockCommits, mockDocs, mockCalendar, mockKpis, mockSlack } = require('./data/mockData');
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -98,8 +98,29 @@ app.post('/api/calendar/availability', (req, res) => {
     ...mockCalendar,
     request: {
       date: date || 'tomorrow',
-      members: Array.isArray(members) && members.length ? members : ['John Doe', 'Jane Smith']
+      members: Array.isArray(members) && members.length ? members : ['John Doe', 'Jane Smith'],
+      timezone: mockCalendar.timezone
     }
+  });
+});
+
+app.get('/api/kpi/summary', (req, res) => {
+  const { period } = req.query;
+  console.log(`[kpi/summary] period="${period || mockKpis.period}"`);
+  res.json({
+    ...mockKpis,
+    period: period || mockKpis.period
+  });
+});
+
+app.get('/api/slack/summary', (req, res) => {
+  const { channel = mockSlack.channel, date = 'yesterday' } = req.query;
+  console.log(`[slack/summary] channel="${channel}" date="${date}"`);
+  res.json({
+    channel,
+    date,
+    summary: mockSlack.summary,
+    messages: mockSlack.messages
   });
 });
 

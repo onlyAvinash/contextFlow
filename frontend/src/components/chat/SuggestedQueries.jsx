@@ -3,7 +3,8 @@ import { suggestedQueries } from '../../data/demoResponses.jsx';
 const quickActions = [
   'View My Tasks',
   'Team Calendar',
-  'Recent Docs'
+  'Recent Docs',
+  'Revenue KPIs'
 ];
 
 export function SuggestedQueries({ onSelect }) {
@@ -16,7 +17,7 @@ export function SuggestedQueries({ onSelect }) {
             <li
               key={item}
               className="cursor-pointer rounded-lg border border-white/5 bg-bg-tertiary/60 px-3 py-2 transition hover:border-accent-primary/40 hover:text-text-primary"
-              onClick={() => onSelect(item)}
+              onClick={() => onSelect(item, { autoSend: true })}
             >
               {item}
             </li>
@@ -30,7 +31,7 @@ export function SuggestedQueries({ onSelect }) {
             <button
               key={item}
               type="button"
-              onClick={() => onSelect(item)}
+              onClick={() => onSelect(item, { autoSend: true })}
               className="rounded-full border border-white/10 bg-bg-tertiary/70 px-4 py-2 text-xs text-text-secondary transition hover:border-accent-primary/40 hover:text-text-primary"
             >
               {item}

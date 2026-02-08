@@ -3,7 +3,13 @@ import { MetricCard } from '../components/tambo/MetricCard.jsx';
 import { TimelineView } from '../components/tambo/TimelineView.jsx';
 import { DocumentCard } from '../components/tambo/DocumentCard.jsx';
 import { ActionForm } from '../components/tambo/ActionForm.jsx';
-import { demoBugs, demoDocs, demoTimeline, demoAvailability, demoMetrics } from './demoData.js';
+import {
+  demoBugs,
+  demoDocs,
+  demoTimeline,
+  demoAvailability,
+  demoMetrics
+} from './demoData.js';
 
 const bugColumns = [
   { key: 'title', label: 'Title', type: 'text' },
@@ -21,7 +27,8 @@ const suggestionMap = [
       components: [
         <MetricCard key="metric" {...demoMetrics} />,
         <DataTable key="table" title="P0 Bugs Assigned to You" columns={bugColumns} rows={demoBugs} />
-      ]
+      ],
+      componentNames: ['MetricCard', 'DataTable']
     }
   },
   {
@@ -30,7 +37,8 @@ const suggestionMap = [
       text: 'Last week overview: 47 commits, 12 PRs, 3 docs updated.',
       components: [
         <TimelineView key="timeline" title="Engineering Timeline" events={demoTimeline} />
-      ]
+      ],
+      componentNames: ['TimelineView']
     }
   },
   {
@@ -45,16 +53,34 @@ const suggestionMap = [
           time={demoAvailability.time}
           attendees={demoAvailability.attendees}
         />
-      ]
+      ],
+      componentNames: ['ActionForm']
     }
   },
   {
     match: ['docs', 'documentation', 'authentication'],
     response: {
       text: 'I found the most relevant docs in Notion.',
-      components: demoDocs.map((doc, idx) => <DocumentCard key={idx} {...doc} />)
+      components: demoDocs.map((doc, idx) => <DocumentCard key={idx} {...doc} />),
+      componentNames: ['DocumentCard']
     }
-  }
+  },
+  {
+    match: ['snapshot', 'overview', 'engineering snapshot'],
+    response: {
+      text: 'Engineering snapshot: 47 commits, 12 PRs, 3 docs, 12 critical bugs.',
+      components: [
+        <div key="snapshot-metrics" className="grid gap-4 md:grid-cols-2">
+          <MetricCard title="Commits" value={47} trend={{ direction: 'up', percentage: 9, period: 'WoW' }} />
+          <MetricCard title="Open P0 Bugs" value={12} trend={{ direction: 'down', percentage: 8, period: 'WoW' }} />
+        </div>,
+        <TimelineView key="snapshot-timeline" title="Key Events" events={demoTimeline} />,
+        <DataTable key="snapshot-table" title="Critical Bugs" columns={bugColumns} rows={demoBugs} />
+      ],
+      componentNames: ['MetricCard', 'TimelineView', 'DataTable']
+    }
+  },
+  // KPI demo removed to allow full Tambo control for KPI queries.
 ];
 
 export const suggestedQueries = [
@@ -62,7 +88,10 @@ export const suggestedQueries = [
   'What did engineering ship last week?',
   'Who is available for a meeting tomorrow at 3pm?',
   'Find docs about authentication',
-  'Summarize recent backend commits'
+  'Summarize recent backend commits',
+  'Show revenue KPIs for Q4',
+  'Give me an engineering snapshot',
+  'Summarize Slack decisions from yesterday'
 ];
 
 export function getDemoResponse(query) {

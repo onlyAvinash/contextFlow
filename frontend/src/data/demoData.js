@@ -70,7 +70,7 @@ export const demoTimeline = [
 
 export const demoAvailability = {
   date: 'Tomorrow',
-  time: '3:00 PM',
+  time: '15:00',
   attendees: ['John Doe', 'Jane Smith']
 };
 
@@ -80,3 +80,30 @@ export const demoMetrics = {
   trend: { direction: 'down', percentage: 8, period: 'vs last week' },
   sparkline: [{ value: 16 }, { value: 15 }, { value: 14 }, { value: 12 }]
 };
+
+export const demoKpis = [
+  {
+    title: 'Revenue (Q4)',
+    value: '$4.2M',
+    trend: { direction: 'up', percentage: 12, period: 'QoQ' },
+    sparkline: [{ value: 3.2 }, { value: 3.6 }, { value: 4.0 }, { value: 4.2 }]
+  },
+  {
+    title: 'New ARR',
+    value: '$1.1M',
+    trend: { direction: 'up', percentage: 8, period: 'QoQ' },
+    sparkline: [{ value: 0.7 }, { value: 0.9 }, { value: 1.0 }, { value: 1.1 }]
+  },
+  {
+    title: 'Churn',
+    value: '3.2%',
+    trend: { direction: 'down', percentage: 1.4, period: 'QoQ' },
+    sparkline: [{ value: 4.6 }, { value: 4.0 }, { value: 3.6 }, { value: 3.2 }]
+  }
+];
+
+export const demoRevenueTable = [
+  { region: 'North America', revenue: '$1.9M', growth: '14%' },
+  { region: 'EMEA', revenue: '$1.2M', growth: '9%' },
+  { region: 'APAC', revenue: '$0.9M', growth: '11%' }
+];

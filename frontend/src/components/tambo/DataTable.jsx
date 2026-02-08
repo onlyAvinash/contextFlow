@@ -44,8 +44,8 @@ export function DataTable({ title, columns = [], rows = [], actions }) {
         <table className="w-full text-left text-sm">
           <thead className="bg-bg-tertiary/80 text-xs uppercase text-text-muted">
             <tr>
-              {columns.map((col) => (
-                <th key={col.key} className="px-4 py-3">
+              {columns.map((col, idx) => (
+                <th key={`${col.key}-${idx}`} className="px-4 py-3">
                   <span className="flex items-center gap-2">
                     {col.label}
                     <ArrowUpDown className="h-3.5 w-3.5 opacity-60" />
@@ -63,8 +63,8 @@ export function DataTable({ title, columns = [], rows = [], actions }) {
                 transition={{ delay: idx * 0.03 }}
                 className="hover:bg-bg-tertiary/60"
               >
-                {columns.map((col) => (
-                  <td key={col.key} className="px-4 py-3 text-text-secondary">
+                {columns.map((col, colIdx) => (
+                  <td key={`${col.key}-${colIdx}`} className="px-4 py-3 text-text-secondary">
                     {formatCell(row[col.key], col.type)}
                   </td>
                 ))}
