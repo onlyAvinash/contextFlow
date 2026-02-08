@@ -328,16 +328,7 @@ export function ChatInterface() {
             ))}
           </div>
         </section>
-        {messages.length > 0 && (
-          <section className="rounded-2xl border border-white/10 bg-bg-secondary/60 p-3">
-            <h3 className="text-xs uppercase tracking-[0.25em] text-text-muted">
-              Try asking
-            </h3>
-            <div className="mt-2">
-              <SuggestedQueries onSelect={handleSuggestion} variant="compact" />
-            </div>
-          </section>
-        )}
+        {messages.length > 0 && null}
       </aside>
       {messages.length > 0 && (
         <section className="rounded-2xl border border-white/10 bg-bg-secondary/60 p-4 sticky bottom-8 z-10 lg:col-span-1">
