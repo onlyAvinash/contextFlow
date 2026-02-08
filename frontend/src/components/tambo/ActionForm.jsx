@@ -21,10 +21,16 @@ function normalizeDate(value) {
 }
 
 export function ActionForm({ title, date, time, attendees = [] }) {
-  const [meetingTitle, setMeetingTitle] = useState(title || 'Engineering Sync');
+  const inferredAttendees = (() => {
+    if (attendees.length > 0) return attendees;
+    const match = (title || "").match(/with\\s+([A-Za-z]+(?:\\s+[A-Za-z]+)*)/i);
+    return match ? [match[1].trim()] : [];
+  })();
+
+  const [meetingTitle, setMeetingTitle] = useState(title || "Engineering Sync");
   const [meetingDate, setMeetingDate] = useState(normalizeDate(date));
   const [meetingTime, setMeetingTime] = useState(normalizeTime(time));
-  const [meetingAttendees, setMeetingAttendees] = useState(attendees);
+  const [meetingAttendees, setMeetingAttendees] = useState(inferredAttendees);
   const [newAttendee, setNewAttendee] = useState('');
   const [status, setStatus] = useState('');
 
@@ -35,10 +41,10 @@ export function ActionForm({ title, date, time, attendees = [] }) {
   };
 
   const handleCancel = () => {
-    setMeetingTitle(title || 'Engineering Sync');
-    setMeetingDate(date || '2026-02-08');
-    setMeetingTime(time || '14:00');
-    setMeetingAttendees(attendees);
+    setMeetingTitle(title || "Engineering Sync");
+    setMeetingDate(normalizeDate(date));
+    setMeetingTime(normalizeTime(time));
+    setMeetingAttendees(inferredAttendees);
     setNewAttendee('');
     setStatus('Cancelled changes.');
   };
@@ -104,7 +110,7 @@ export function ActionForm({ title, date, time, attendees = [] }) {
                 value={newAttendee}
                 onChange={(event) => setNewAttendee(event.target.value)}
                 placeholder="Add attendee email or name"
-                className="flex-1 rounded-lg border border-dashed border-white/20 bg-bg-tertiary/40 px-3 py-2 text-text-primary placeholder:text-text-muted focus:border-accent-primary/60 focus:outline-none"
+                className="flex-1 rounded-lg border border-dashed border-white/20 bg-white/95 px-3 py-2 text-bg-primary placeholder:text-text-muted focus:border-accent-primary/60 focus:outline-none"
               />
               <button
                 type="button"

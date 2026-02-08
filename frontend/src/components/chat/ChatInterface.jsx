@@ -26,6 +26,10 @@ function isJsonLike(text) {
   );
 }
 
+function unescapeMarkdown(text) {
+  return text.replace(/\\\*/g, "*").replace(/\\_/g, "_").replace(/\\`/g, "`");
+}
+
 const componentToSource = {
   DataTable: "GitHub",
   TimelineView: "GitHub",
@@ -44,7 +48,13 @@ export function ChatInterface() {
 
   const messages = useMemo(() => {
     const remoteMessages = thread?.messages ?? [];
-    return [...localMessages, ...remoteMessages];
+    const getTime = (msg) =>
+      Date.parse(msg?.createdAt || msg?.created || msg?.timestamp || "") || 0;
+    const normalizedRemote =
+      remoteMessages.length > 1 && getTime(remoteMessages[0]) > getTime(remoteMessages[remoteMessages.length - 1])
+        ? [...remoteMessages].reverse()
+        : remoteMessages;
+    return [...localMessages, ...normalizedRemote];
   }, [localMessages, thread]);
 
   useEffect(() => {
@@ -74,6 +84,11 @@ export function ChatInterface() {
     return () => window.removeEventListener("tambo:tool-status", handler);
   }, []);
 
+  const scrollToBottom = () => {
+    if (!scrollRef.current) return;
+    scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  };
+
   const submitQuery = async (query) => {
     if (!query?.trim() || isPending) return;
     const trimmed = query.trim();
@@ -97,6 +112,7 @@ export function ChatInterface() {
 
     await sendThreadMessage(trimmed, { streamResponse: true });
     setInputValue("");
+    scrollToBottom();
   };
 
   const handleSubmit = async (event) => {
@@ -107,7 +123,7 @@ export function ChatInterface() {
   const handleSuggestion = (text, options = {}) => {
     setInputValue(text);
     if (options.autoSend) {
-      submitQuery(text);
+      submitQuery(text).then(scrollToBottom);
     }
   };
 
@@ -135,7 +151,7 @@ export function ChatInterface() {
     <div className="grid h-[calc(100vh-180px)] grid-cols-1 gap-6 lg:grid-cols-[1fr_260px]">
       <section
         ref={scrollRef}
-        className="flex-1 space-y-6 overflow-y-auto pr-2 scrollbar-hidden"
+        className="flex-1 space-y-6 overflow-y-auto pr-2 pb-24 scrollbar-hidden"
       >
         {messages.length === 0 && (
           <section className="rounded-2xl border border-white/10 bg-bg-secondary/60 p-4">
@@ -145,7 +161,7 @@ export function ChatInterface() {
         {messages.map((message, index) => {
           const isUser = message.role === "user";
           const textParts = getTextParts(message.content)
-            .map((part) => part.trim())
+            .map((part) => unescapeMarkdown(part).trim())
             .filter((part) => part.length > 0 && !isJsonLike(part));
           const renderedComponent = message.renderedComponent || null;
           const renderedComponents = message.renderedComponents || [];
@@ -193,7 +209,7 @@ export function ChatInterface() {
             >
               {isUser ? (
                 <div className="flex justify-end">
-                  <div className="max-w-[70%] rounded-2xl bg-accent-primary px-4 py-2 text-sm font-semibold text-bg-primary">
+                  <div className="max-w-[70%] whitespace-pre-wrap break-words rounded-2xl bg-accent-primary px-4 py-2 text-sm font-semibold text-bg-primary">
                     {textParts[0] || message.content}
                   </div>
                 </div>
@@ -201,7 +217,9 @@ export function ChatInterface() {
                 <div className="rounded-2xl border border-white/10 bg-bg-secondary/60 p-4 hover:shadow-glow transition-shadow">
                   {textParts.length > 0 && (
                     <div className="mb-3 rounded-xl border border-white/5 bg-bg-tertiary/40 px-3 py-3 text-sm text-text-secondary">
-                      {textParts[0]}
+                      <ReactMarkdown className="prose prose-invert max-w-none text-sm text-text-secondary">
+                        {textParts[0]}
+                      </ReactMarkdown>
                     </div>
                   )}
                   {sourceChips.length > 0 && (
@@ -310,22 +328,19 @@ export function ChatInterface() {
             ))}
           </div>
         </section>
-        <section className="rounded-2xl border border-white/10 bg-bg-secondary/60 p-4">
-          <h3 className="text-xs uppercase tracking-[0.25em] text-text-muted">
-            Pinned
-          </h3>
-          <div className="mt-3 space-y-2 text-xs text-text-secondary">
-            <div className="rounded-xl border border-white/10 bg-bg-tertiary/50 px-3 py-2">
-              Q4 Planning Doc
+        {messages.length > 0 && (
+          <section className="rounded-2xl border border-white/10 bg-bg-secondary/60 p-3">
+            <h3 className="text-xs uppercase tracking-[0.25em] text-text-muted">
+              Try asking
+            </h3>
+            <div className="mt-2">
+              <SuggestedQueries onSelect={handleSuggestion} variant="compact" />
             </div>
-            <div className="rounded-xl border border-white/10 bg-bg-tertiary/50 px-3 py-2">
-              PROJ-4521 Spec
-            </div>
-          </div>
-        </section>
+          </section>
+        )}
       </aside>
       {messages.length > 0 && (
-        <section className="rounded-2xl border border-white/10 bg-bg-secondary/60 p-4 sticky bottom-8 lg:col-span-1">
+        <section className="rounded-2xl border border-white/10 bg-bg-secondary/60 p-4 sticky bottom-8 z-10 lg:col-span-1">
           {inputForm}
           <p className="mt-2 text-[11px] text-text-muted">
             Press Enter to send • Shift+Enter for a new line

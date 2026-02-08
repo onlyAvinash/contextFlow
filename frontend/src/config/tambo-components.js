@@ -93,13 +93,13 @@ export const tamboComponents = [
   {
     name: "ActionForm",
     description:
-      "Simple action form for scheduling meetings or creating items.",
+      "Action form for scheduling meetings. Always include any person explicitly named in the user query in the attendees list, and prefill date/time if mentioned. The attendees list must not be empty.",
     component: ActionForm,
     propsSchema: z.object({
       title: z.string(),
       date: z.string(),
       time: z.string(),
-      attendees: z.array(z.string()),
+      attendees: z.array(z.string()).min(1),
     }),
   },
   {

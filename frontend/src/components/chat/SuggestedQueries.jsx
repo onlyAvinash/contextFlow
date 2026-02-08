@@ -7,12 +7,12 @@ const quickActions = [
   'Revenue KPIs'
 ];
 
-export function SuggestedQueries({ onSelect }) {
+export function SuggestedQueries({ onSelect, variant = "full" }) {
   return (
-    <div className="grid gap-4 lg:grid-cols-2">
+    <div className={variant === "compact" ? "grid gap-3" : "grid gap-4 lg:grid-cols-2"}>
       <div className="rounded-2xl border border-white/10 bg-bg-secondary/70 p-4">
         <h3 className="text-sm font-semibold text-text-secondary">Try asking</h3>
-        <ul className="mt-3 space-y-2 text-sm text-text-muted">
+        <ul className={variant === "compact" ? "mt-3 space-y-2 text-xs text-text-muted" : "mt-3 space-y-2 text-sm text-text-muted"}>
           {suggestedQueries.map((item) => (
             <li
               key={item}
@@ -24,7 +24,8 @@ export function SuggestedQueries({ onSelect }) {
           ))}
         </ul>
       </div>
-      <div className="rounded-2xl border border-white/10 bg-bg-secondary/70 p-4">
+      {variant !== "compact" && (
+        <div className="rounded-2xl border border-white/10 bg-bg-secondary/70 p-4">
         <h3 className="text-sm font-semibold text-text-secondary">Quick actions</h3>
         <div className="mt-3 flex flex-wrap gap-2">
           {quickActions.map((item) => (
@@ -39,6 +40,7 @@ export function SuggestedQueries({ onSelect }) {
           ))}
         </div>
       </div>
+      )}
     </div>
   );
 }

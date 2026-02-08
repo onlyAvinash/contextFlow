@@ -1,6 +1,6 @@
 export function Header() {
   return (
-    <header className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-bg-secondary/70 px-6 py-5 shadow-glow backdrop-blur">
+    <header className="sticky top-0 z-20 w-full border-b border-white/10 bg-bg-secondary/80 px-6 py-4 backdrop-blur">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="text-[11px] uppercase tracking-[0.35em] text-text-muted">ContextFlow</p>
@@ -13,7 +13,7 @@ export function Header() {
           </button>
         </div>
       </div>
-      <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-text-secondary/80">
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs text-text-secondary/80">
         <span>Ask a question. Get the perfect interface.</span>
         <span className="text-text-muted">Last sync: 2m ago • System status: Healthy</span>
       </div>

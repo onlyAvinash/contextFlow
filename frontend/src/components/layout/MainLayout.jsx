@@ -1,13 +1,10 @@
-import { Header } from './Header.jsx';
+import { Header } from "./Header.jsx";
 
 export function MainLayout({ children }) {
   return (
-    <div className="relative mx-auto flex min-h-screen max-w-7xl flex-col px-6 pb-10 pt-8">
+    <div className="relative flex min-h-screen flex-col pb-10">
       <Header />
-      <main className="mt-6 flex-1">{children}</main>
-      <footer className="mt-8 text-xs text-text-muted">
-        ContextFlow MVP • Built for UI Strikes Back
-      </footer>
+      <main className="mx-auto mt-6 w-full max-w-7xl flex-1 px-6">{children}</main>
     </div>
   );
 }
